@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<!-- 基础性文件，请直接修改 Config.json 来定义站点的基本形态。修改 pages/ 文件夹内的内容进行增删查改内容。 -->
+
+<html lang="{{ lang }}">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <!-- 直接修改 head 并非推荐写法，须在 Config.json 中声明场景。 -->
+        {{ head }}
+    </head>
+    <body>
+        <div class="app"></div>
+        <script type="module" src="/application/app.mjs"></script>
+
+        <!-- 直接修改 body 并非推荐写法，除非您希望导入一些特别的广告。 -->
+        {{ body }}
+    </body>
+</html>

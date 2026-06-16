@@ -1,0 +1,66 @@
+[
+  {
+    "id": 1,
+    "title": "React 19 新特性完全指南",
+    "date": "2025-12-28",
+    "category": "前端技术",
+    "tags": ["React", "前端"],
+    "desc": "React 19 带来了全新的 Compiler、自动资源管理、服务端组件优化等重磅更新，大幅提升开发体验。深入了解 use() hook、ref 清理函数、文档元数据支持等新特性。",
+    "featured": true,
+    "contentHtml": "<p>React 19 是 React 生态系统的一次重大升级，带来了<strong>全新的 React Compiler</strong>（自动记忆化）、改进的<strong>服务端组件</strong>支持，以及多个开发者体验优化。</p><h2 id=\"toc-compiler\">React Compiler — 自动记忆化</h2><p>React 19 引入了一个实验性的编译器，它能在构建时<strong>自动为代码添加 memo、useMemo 和 useCallback</strong>。开发者不再需要手动管理这些优化，编译器会分析组件的依赖关系并自动处理重新渲染。</p><div class=\"code-block\"><pre><code class=\"language-jsx\">// React 19: 编译器自动优化，无需手动 memo\nfunction UserProfile({ user }) {\n  return (\n    &lt;div&gt;\n      &lt;h2&gt;{user.name}&lt;/h2&gt;\n      &lt;p&gt;{user.email}&lt;/p&gt;\n    &lt;/div&gt;\n  );\n}\n// 编译器自动等价于 React.memo(UserProfile)</code></pre></div><h2 id=\"toc-use-hook\">全新的 use() Hook</h2><p><code>use()</code> 是 React 19 中一个突破性的 Hook，它允许在渲染期间<strong>直接读取 Promise 和 Context</strong>，而不需要配合 Suspense 的繁琐写法。</p><div class=\"code-block\"><pre><code class=\"language-jsx\">async function fetchUser(id) {\n  const res = await fetch(`/api/users/${id}`);\n  return res.json();\n}\n\nfunction UserPage({ userId }) {\n  const user = use(fetchUser(userId));\n  return &lt;div&gt;欢迎, {user.name}&lt;/div&gt;\n}</code></pre></div><blockquote>提示：use() 必须在组件的顶层调用，且它的 Promise 应该被缓存以避免重复请求。</blockquote><h2 id=\"toc-ref-cleanup\">Ref 清理函数</h2><p>React 19 允许在 <code>useRef</code> 的回调形式中返回一个<strong>清理函数</strong>，当元素从 DOM 中移除时自动执行。这对于管理事件监听器和第三方库非常有用。</p><h2 id=\"toc-metadata\">文档元数据支持</h2><p>现在你可以在组件树中的<strong>任意位置</strong>渲染 <code>&lt;title&gt;</code>、<code>&lt;meta&gt;</code> 和 <code>&lt;link&gt;</code> 标签，React 会自动将它们提升到文档头部。这让 SEO 管理和动态标题变得异常简单。</p><h2 id=\"toc-summary\">总结</h2><p>React 19 的核心改进围绕<strong>减少手动优化</strong>和<strong>提升开发者体验</strong>展开。Compiler 自动记忆化、use() Hook、Ref 清理函数和元数据支持是最值得关注的四大特性。</p>"
+  },
+  {
+    "id": 2,
+    "title": "VSCode 主题开发从 0 到 1",
+    "date": "2025-12-25",
+    "category": "工具配置",
+    "tags": ["VSCode", "主题"],
+    "desc": "手把手教你制作属于自己的 VSCode 主题，包含颜色规则、token 配置与发布流程。",
+    "codeSnippet": "{\n  \"colors\": {\n    \"editor.background\": \"#ffffff\",\n    \"editor.foreground\": \"#24292e\"\n  }\n}",
+    "codeLang": "json",
+    "featured": true,
+    "contentHtml": "<p>创建自定义 VSCode 主题是<strong>深度个性化编辑器</strong>的最佳方式。本指南将带你从零开始，完成一个完整的主题制作流程。</p><h2 id=\"toc-setup\">项目初始化</h2><p>首先使用 Yeoman 生成器创建主题项目。确保已安装 Node.js，然后运行以下命令：</p><div class=\"code-block\"><pre><code class=\"language-bash\">npm install -g yo generator-code\nyo code</code></pre></div><p>选择 <strong>\"New Color Theme\"</strong> 选项，然后选择一个基础主题作为起点（推荐从浅色主题开始）。</p><h2 id=\"toc-colors\">颜色规则详解</h2><p>主题的核心是 <code>colors</code> 对象，它定义了编辑器的<strong>全局颜色变量</strong>。以下是关键的颜色标记：</p><div class=\"code-block\"><pre><code class=\"language-json\">{\n  \"colors\": {\n    \"editor.background\": \"#ffffff\",\n    \"editor.foreground\": \"#24292e\",\n    \"editor.lineHighlightBackground\": \"#f5f5f5\",\n    \"editor.selectionBackground\": \"#cce5ff\",\n    \"editorCursor.foreground\": \"#0066cc\",\n    \"editorLineNumber.foreground\": \"#959da5\",\n    \"sideBar.background\": \"#f8f8f8\",\n    \"activityBar.background\": \"#ffffff\",\n    \"statusBar.background\": \"#0066cc\"\n  }\n}</code></pre></div><h2 id=\"toc-tokens\">Token 颜色配置</h2><p><code>tokenColors</code> 定义了<strong>语法高亮的颜色</strong>。你可以针对不同的语言作用域（scope）设置前景色、背景色和字体样式：</p><div class=\"code-block\"><pre><code class=\"language-json\">{\n  \"tokenColors\": [\n    {\n      \"scope\": \"keyword\",\n      \"settings\": { \"foreground\": \"#d73a49\" }\n    },\n    {\n      \"scope\": \"string\",\n      \"settings\": { \"foreground\": \"#032f62\" }\n    },\n    {\n      \"scope\": \"comment\",\n      \"settings\": { \"foreground\": \"#6a737d\", \"fontStyle\": \"italic\" }\n    }\n  ]\n}</code></pre></div><h2 id=\"toc-publish\">发布到市场</h2><p>完成主题后，使用 <code>vsce</code> 工具打包并发布。首先更新 <code>package.json</code> 中的版本号，然后运行：</p><div class=\"code-block\"><pre><code class=\"language-bash\">vsce package\nvsce publish</code></pre></div><blockquote>发布前请确保在 Azure DevOps 创建了个人访问令牌，并且主题图标和 README 已经准备就绪。</blockquote><h2 id=\"toc-summary\">总结</h2><p>制作 VSCode 主题的核心在于<strong>颜色搭配的一致性</strong>。建议从模仿自己喜欢的编辑器开始，逐步调整直到满意。发布后持续维护，响应用户反馈。</p>"
+  },
+  {
+    "id": 3,
+    "title": "现代 CSS 布局完全掌握",
+    "date": "2025-12-20",
+    "category": "CSS 技巧",
+    "tags": ["CSS", "布局"],
+    "desc": "Flex + Grid 最佳实践、CSS 变量、容器查询、动画过渡，打造高还原度 UI。从基础到进阶，覆盖响应式设计核心要点。",
+    "featured": true,
+    "contentHtml": "<p>现代 CSS 布局已经从<strong>浮动和定位</strong>演进到以 <strong>Flexbox 和 Grid</strong> 为核心的体系。本文将带你系统掌握这些关键技术。</p><h2 id=\"toc-flex\">Flexbox 最佳实践</h2><p>Flexbox 适用于<strong>一维布局</strong>——在行或列方向上排列元素。它的核心属性包括 <code>justify-content</code>、<code>align-items</code> 和 <code>gap</code>。</p><div class=\"code-block\"><pre><code class=\"language-css\">.flex-container {\n  display: flex;\n  gap: 16px;\n  flex-wrap: wrap;\n  justify-content: space-between;\n  align-items: center;\n}\n.flex-item {\n  flex: 1 1 300px; /* 增长、收缩、基础宽度 */\n  min-width: 0;     /* 防止溢出 */\n}</code></pre></div><h2 id=\"toc-grid\">Grid 布局精髓</h2><p>CSS Grid 专为<strong>二维布局</strong>设计，可以同时控制行和列。使用 <code>grid-template-columns</code> 和 <code>grid-template-rows</code> 定义网格结构。</p><div class=\"code-block\"><pre><code class=\"language-css\">.grid-container {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));\n  gap: 20px;\n}\n.grid-item-full {\n  grid-column: 1 / -1; /* 跨越整行 */\n}</code></pre></div><h2 id=\"toc-container-queries\">容器查询</h2><p><strong>@container</strong> 规则让组件能根据<strong>自身容器大小</strong>而非视口大小进行响应式调整，是组件化设计的革命性特性。</p><blockquote>容器查询使得封装良好的组件可以在任何上下文中独立工作，无需依赖全局媒体查询。</blockquote><h2 id=\"toc-animations\">CSS 动画与过渡</h2><p>现代 CSS 提供了 <code>transition</code> 和 <code>@keyframes</code> 两种动画方式。配合 <code>prefers-reduced-motion</code> 媒体查询可以尊重用户的减少动画偏好。</p><h2 id=\"toc-summary\">总结</h2><p>掌握 Flex + Grid + 容器查询，你就能应对<strong>95% 以上的布局需求</strong>。记住：Flex 用于一维，Grid 用于二维，容器查询让组件自适应。</p>"
+  },
+  {
+    "id": 4,
+    "title": "TypeScript 5.5 实用新特性",
+    "date": "2025-12-15",
+    "category": "前端技术",
+    "tags": ["TypeScript", "前端"],
+    "desc": "TypeScript 5.5 带来了推断类型谓词、独立块语句类型 narrowing、更好的类型收窄等实用改进。",
+    "featured": false,
+    "contentHtml": "<p>TypeScript 5.5 是一次<strong>质量提升</strong>更新，带来了多个实用的类型推断改进。让我们逐一了解。</p><h2 id=\"toc-predicate\">推断类型谓词</h2><p>现在 TypeScript 能<strong>自动推断</strong>过滤函数返回的类型谓词。例如使用 <code>filter</code> 后，结果数组的类型会被自动收窄。</p><div class=\"code-block\"><pre><code class=\"language-typescript\">const items = ['hello', undefined, 'world', null];\n// TypeScript 5.5 自动推断出 string[]\nconst validItems = items.filter(item => item !== undefined && item !== null);</code></pre></div><h2 id=\"toc-narrowing\">独立块语句类型收窄</h2><p>在 <code>if</code>、<code>switch</code> 等块语句中，TypeScript 5.5 的<strong>类型收窄更加精准</strong>，减少了不必要的类型断言。</p><h2 id=\"toc-summary\">总结</h2><p>这些改进让 TypeScript 的类型系统<strong>更加智能</strong>，减少了手动类型守卫的需求，提升了开发效率。</p>"
+  },
+  {
+    "id": 5,
+    "title": "Git 工作流最佳实践",
+    "date": "2025-12-10",
+    "category": "工具配置",
+    "tags": ["Git", "DevOps"],
+    "desc": "从分支策略到 commit 规范，打造高效团队协作的 Git 工作流。涵盖 Git Flow、Trunk-Based Development 等主流模式对比。",
+    "featured": false,
+    "contentHtml": "<p>高效的 Git 工作流是团队协作的<strong>基石</strong>。本文将对比主流分支策略并给出实践建议。</p><h2 id=\"toc-gitflow\">Git Flow</h2><p>Git Flow 定义了严格的分支模型：<strong>main、develop、feature、release、hotfix</strong>。适合有明确发布周期的项目。</p><h2 id=\"toc-trunk\">Trunk-Based Development</h2><p><strong>主干开发</strong>模式要求所有开发者频繁向 main 分支提交小改动，配合 feature flags 和持续集成。</p><blockquote>主干开发是持续交付的核心实践之一，强调小批量、高频次的集成。</blockquote><h2 id=\"toc-commits\">Commit 规范</h2><p>使用 <strong>Conventional Commits</strong> 规范可以让提交历史清晰可读，便于自动生成 changelog。</p><div class=\"code-block\"><pre><code class=\"language-bash\">feat: 添加用户登录功能\nfix: 修复导航栏响应式问题\ndocs: 更新API文档\nrefactor: 重构认证模块</code></pre></div><h2 id=\"toc-summary\">总结</h2><p>选择适合团队规模的工作流，坚持<strong>小而频繁的提交</strong>，并统一 commit 规范，是高效协作的关键。</p>"
+  },
+  {
+    "id": 6,
+    "title": "Node.js 性能优化实战",
+    "date": "2025-12-05",
+    "category": "后端技术",
+    "tags": ["Node.js", "性能"],
+    "desc": "深入 Node.js 事件循环、内存管理、集群模式，分享生产环境下的性能调优经验和监控方案。",
+    "codeSnippet": "const cluster = require('cluster');\nconst os = require('os');\n\nif (cluster.isPrimary) {\n  os.cpus().forEach(() => cluster.fork());\n} else {\n  // 启动服务\n}",
+    "codeLang": "javascript",
+    "featured": false,
+    "contentHtml": "<p>Node.js 性能优化需要从<strong>事件循环、内存管理和进程模型</strong>三个维度综合考量。</p><h2 id=\"toc-eventloop\">理解事件循环</h2><p>Node.js 的事件循环分为多个阶段：<strong>timers、pending callbacks、idle/prepare、poll、check、close callbacks</strong>。理解各阶段有助于避免阻塞。</p><h2 id=\"toc-cluster\">集群模式</h2><p>利用 <code>cluster</code> 模块可以<strong>充分利用多核 CPU</strong>，主进程负责分发请求，工作进程处理实际业务。</p><div class=\"code-block\"><pre><code class=\"language-javascript\">const cluster = require('cluster');\nconst os = require('os');\nconst http = require('http');\n\nif (cluster.isPrimary) {\n  const numCPUs = os.cpus().length;\n  for (let i = 0; i < numCPUs; i++) {\n    cluster.fork();\n  }\n  cluster.on('exit', (worker) => {\n    console.log(`Worker ${worker.id} 退出，正在重启...`);\n    cluster.fork();\n  });\n} else {\n  http.createServer((req, res) => {\n    res.end('Hello from worker ' + cluster.worker.id);\n  }).listen(3000);\n}</code></pre></div><h2 id=\"toc-memory\">内存管理</h2><p>注意<strong>内存泄漏</strong>的常见来源：全局变量、未清理的定时器、闭包引用、以及事件监听器未移除。使用 <code>--inspect</code> 和 Chrome DevTools 进行 heap snapshot 分析。</p><h2 id=\"toc-summary\">总结</h2><p>生产环境的 Node.js 优化需要<strong>持续监控</strong>（如使用 PM2、Prometheus），结合集群模式、合理的内存管理和事件循环优化。</p>"
+  }
+]

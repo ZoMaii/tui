@@ -1,0 +1,108 @@
+{
+    ".site":{
+        ".scenario": "seo.xml",
+        "domain": "blog.localhost",
+        "port": "80",
+        "index": "./pages/classic.html",
+        
+        "rewrite":true,
+        "staticSite":true,
+        
+        "indexedFileInfo": "%Author%-%EMail%-%HashCheck%-%TimeStamp%-%URL%",
+        "follow-new": false,
+
+        ".tips": "如果广播模式(批量化)建站，务必将 domain 的值修改为 127.0.0.1 避免主机寻找错误。"
+    },
+    
+    "html":{
+        "lang": "zh-CN",
+        "icon": "",
+        "title": "",
+        "canonical": "",
+
+        "base": {
+            "charset": "utf-8",
+            "viewport": "width=device-width, initial-scale=1.0"
+        },
+
+        "meta": {
+            "keywords": [],
+            "description": ""
+        },
+
+        "alternate":{
+            "x-default":"",
+            "zh-Hans":"",
+            "zh-Hant":"",
+            "ja":"",
+            "en":""
+        },
+
+        "robots":{
+            "index": true,
+            "follow": true
+        },
+
+        "og": {
+            "type":"",
+            "site":"",
+            "title":"",
+            "description":"",
+            "image":"",
+            "url":""
+        },
+
+        "x": {
+            "alias": "twitter",
+            "card": "",
+            "site":""
+        }
+    },
+
+    "release": {
+        "robots": {
+            "enabled": true,
+            "rules": [
+                { "agent": "GPTBot", "disallow": "/" },
+                { "agent": "Googlebot", "allow": "/" }
+            ],
+            "sitemap": "https://blog.localhost/sitemap.xml",
+            "Crawl-delay": "",
+            "Request-rate": "",
+            "Visit-time": ""
+        },
+
+        "sitemap": {
+            "enabled": true,
+            "defaults": {
+            "changefreq": "weekly",
+            "priority": 0.7
+            }
+        },
+
+        "Schema.org":{
+            "dynamic":true,
+            "site": {
+                "@type": "Organization",
+                "name": "tui 建站模板",
+                "url": "https://blog.localhost",
+                "logo": "https://blog.localhost/logo.png",
+                "sameAs": [""]
+            }
+        },
+
+        "security.txt":false,
+
+        "LLMs.txt":{
+            "dynamic":true
+        },
+
+        "llms-full.txt":{
+            "dynamic":true
+        }
+    },
+
+    "to": {
+        ".tips":"自定义你的接入方式，主要应用于网关交换"
+    }
+}
