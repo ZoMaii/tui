@@ -1,0 +1,46 @@
+[
+  {
+    "id": 5,
+    "title": "Git 工作流最佳实践",
+    "date": "2025-12-10",
+    "category": "工具配置",
+    "tags": ["Git", "DevOps"],
+    "desc": "从分支策略到 commit 规范，打造高效团队协作的 Git 工作流。涵盖 Git Flow、Trunk-Based Development 等主流模式对比。",
+    "featured": false
+  },
+  {
+    "id": 6,
+    "new": 7,
+    "title": "Node.js 性能优化实战",
+    "date": "2025-12-05",
+    "category": "后端技术",
+    "tags": ["Node.js", "性能"],
+    "desc": "深入 Node.js 事件循环、内存管理、集群模式，分享生产环境下的性能调优经验和监控方案。",
+    "codeSnippet": "const cluster = require('cluster');\nconst os = require('os');\n\nif (cluster.isPrimary) {\n  os.cpus().forEach(() => cluster.fork());\n} else {\n  // 启动服务\n}",
+    "codeLang": "javascript",
+    "featured": false
+  },
+  {
+    "id": 7,
+    "new": 8,
+    "title": "[更正0]Node.js 性能优化实战",
+    "date": "2025-12-05",
+    "category": "后端技术",
+    "tags": ["Node.js", "性能"],
+    "desc": "深入 Node.js 事件循环、内存管理、集群模式，分享生产环境下的性能调优经验和监控方案。",
+    "codeSnippet": "const cluster = require('cluster');\nconst os = require('os');\n\nif (cluster.isPrimary) {\n  os.cpus().forEach(() => cluster.fork());\n} else {\n  // 启动服务\n}",
+    "codeLang": "javascript",
+    "featured": false
+  },
+  {
+    "id": 8,
+    "title": "[更正1]Node.js 性能优化实战",
+    "date": "2025-12-05",
+    "category": "后端技术",
+    "tags": ["Node.js", "性能"],
+    "desc": "深入 Node.js 事件循环、内存管理、集群模式，分享生产环境下的性能调优经验和监控方案。",
+    "codeSnippet": "const cluster = require('cluster');\nconst os = require('os');\n\nif (cluster.isPrimary) {\n  os.cpus().forEach(() => cluster.fork());\n} else {\n  // 启动服务\n}",
+    "codeLang": "javascript",
+    "featured": false
+  }
+]

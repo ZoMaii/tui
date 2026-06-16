@@ -1,0 +1,3 @@
+{
+    "contentHtml": "<p>高效的 Git 工作流是团队协作的<strong>基石</strong>。本文将对比主流分支策略并给出实践建议。</p><h2 id=\"toc-gitflow\">Git Flow</h2><p>Git Flow 定义了严格的分支模型：<strong>main、develop、feature、release、hotfix</strong>。适合有明确发布周期的项目。</p><h2 id=\"toc-trunk\">Trunk-Based Development</h2><p><strong>主干开发</strong>模式要求所有开发者频繁向 main 分支提交小改动，配合 feature flags 和持续集成。</p><blockquote>主干开发是持续交付的核心实践之一，强调小批量、高频次的集成。</blockquote><h2 id=\"toc-commits\">Commit 规范</h2><p>使用 <strong>Conventional Commits</strong> 规范可以让提交历史清晰可读，便于自动生成 changelog。</p><div class=\"code-block\"><pre><code class=\"language-bash\">feat: 添加用户登录功能\nfix: 修复导航栏响应式问题\ndocs: 更新API文档\nrefactor: 重构认证模块</code></pre></div><h2 id=\"toc-summary\">总结</h2><p>选择适合团队规模的工作流，坚持<strong>小而频繁的提交</strong>，并统一 commit 规范，是高效协作的关键。</p>"
+}

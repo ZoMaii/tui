@@ -1,9 +1,5 @@
-// data/loader.js
-
 /**
  * 带并发限制的批量请求工具
- * @param {Array} tasks - 返回 Promise 的函数数组
- * @param {number} limit - 最大并发数
  */
 async function runWithConcurrencyLimit(tasks, limit = 6) {
     const results = [];
@@ -22,22 +18,31 @@ async function runWithConcurrencyLimit(tasks, limit = 6) {
     return Promise.all(results);
 }
 
-// 原有函数不变
+/** 加载 manifest 统计信息 */
 export async function loadManifest() {
     const response = await fetch('../data/manifest.json');
     if (!response.ok) throw new Error('Manifest 加载失败');
     return response.json();
 }
 
-export async function loadArticlesByPage(url) {
+/** 加载单个摘要分页 */
+export async function loadSummaryPage(url) {
     const response = await fetch(url);
-    if (!response.ok) throw new Error(`分页数据加载失败: ${url}`);
+    if (!response.ok) throw new Error(`摘要加载失败: ${url}`);
     return response.json();
 }
 
-// 修改：支持并发限制
-export async function loadAllArticles(manifest, concurrency = 6) {
-    const tasks = manifest.pages.map(url => () => loadArticlesByPage(url));
+/** 加载全部摘要（带并发控制） */
+export async function loadAllSummaries(manifest, concurrency = 6) {
+    const tasks = manifest.summaryPages.map(url => () => loadSummaryPage(url));
     const pageArrays = await runWithConcurrencyLimit(tasks, concurrency);
     return pageArrays.flat();
+}
+
+/** 加载单篇文章的详情内容 */
+export async function loadArticleDetail(articleId, pattern) {
+    const url = pattern.replace('{id}', articleId);
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`详情加载失败: ${url}`);
+    return response.json(); // { contentHtml: "..." }
 }

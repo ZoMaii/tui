@@ -1,0 +1,40 @@
+[
+  {
+    "id": 1,
+    "title": "React 19 新特性完全指南",
+    "date": "2025-12-28",
+    "category": "前端技术",
+    "tags": ["React", "前端"],
+    "desc": "React 19 带来了全新的 Compiler、自动资源管理、服务端组件优化等重磅更新，大幅提升开发体验。深入了解 use() hook、ref 清理函数、文档元数据支持等新特性。",
+    "featured": true
+  },
+  {
+    "id": 2,
+    "title": "VSCode 主题开发从 0 到 1",
+    "date": "2025-12-25",
+    "category": "工具配置",
+    "tags": ["VSCode", "主题"],
+    "desc": "手把手教你制作属于自己的 VSCode 主题，包含颜色规则、token 配置与发布流程。",
+    "codeSnippet": "{\n  \"colors\": {\n    \"editor.background\": \"#ffffff\",\n    \"editor.foreground\": \"#24292e\"\n  }\n}",
+    "codeLang": "json",
+    "featured": true
+  },
+  {
+    "id": 3,
+    "title": "现代 CSS 布局完全掌握",
+    "date": "2025-12-20",
+    "category": "CSS 技巧",
+    "tags": ["CSS", "布局"],
+    "desc": "Flex + Grid 最佳实践、CSS 变量、容器查询、动画过渡，打造高还原度 UI。从基础到进阶，覆盖响应式设计核心要点。",
+    "featured": true
+  },
+  {
+    "id": 4,
+    "title": "TypeScript 5.5 实用新特性",
+    "date": "2025-12-15",
+    "category": "前端技术",
+    "tags": ["TypeScript", "前端"],
+    "desc": "TypeScript 5.5 带来了推断类型谓词、独立块语句类型 narrowing、更好的类型收窄等实用改进。",
+    "featured": false
+  }
+]

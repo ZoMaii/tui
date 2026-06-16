@@ -1,39 +1,51 @@
 # tips
 为方便演示，仅用实体文件代替，实际上应该使用 API 的方式请求数据。如果是大量数据采用 Hadoop，少量数据使用 Python(AI) 进行数据处理。
 
-出于安全考虑，务必使用计算集群！
+details 内容请从 API->数据库 当中获取。方便对来源控制。这里只是做个演示。
 
-此部分核心内容主要依赖于后端（toHTML...）。需注意 NGINX 的 deny 和 其他鉴权设置。
+如果 后端集群计算成本 + 数据观测成本 过于高昂，尝试使用 GitHub、Cloudflare 的公共免费服务来分摊。
 
 
 
 # todo:
-- [ ] Service Worker 缓存
-- [ ] 时效与变更校验
+- [ ] {client} Service Worker 缓存（sw.js）
+- [ ] {client} 时效与变更校验
 
 
 
-# 当前请求策略：
+# wait
+> 审查的内容不一定意味着会正式上线，实际上受到 **项目性质、资金、复杂度、受众、数据观测** 等综合因素影响。
+- [ ] 冷热数据、浅度搜索与深度搜索（分析 Cookie 必须启用）
+
+
+
+# 当前请求策略
+
+> 由于预设的网站性质原因（无用户监控，静态优先，受用者为主，隐私保护），所以当前未设置 摘要获取 的行为监控逻辑触发。 par 洪峰部分交由 终端CDN 进行部署。
+
+#### 这种架构方案本身无法避免大量请求的出现，在绝大多情况下的流量会瞬间达到阈值导致管控。目前依旧在寻找符合 w3c 技术规范，各个司法管辖区隐私保护政策，适用于大多数形态的 API 方式实现。
+
 
 ```mermaid
 sequenceDiagram
-    participant UI
-    participant loader.js
+    participant Browser
     participant Server
 
-    UI->>loader.js: 调用 loadManifest()
-    loader.js->>Server:  GET /data/manifest.json
-    Server-->>loader.js:  返回 {total, years, tags, pages}
-    loader.js-->>UI:      返回 manifest 对象
+    Browser->>Server: GET /data/manifest.json
+    Server-->>Browser: {total, years, tags, summaryPages, detailFilePattern}
 
-    UI->>loader.js: 调用 loadAllArticles(manifest)
-    loader.js->>loader.js: 提取 manifest.pages（分页文件路径数组）
-    par 并发请求
-        loader.js->>Server:  GET /data/articles-page-1.json
-        loader.js->>Server:  GET /data/articles-page-2.json
-        loader.js->>Server:  GET /data/articles-page-N.json
+    Note over Browser: 获得统计信息，可即时渲染<br/>标签云、时间轴、文章总数
+
+    par 并发加载摘要（限6个并发）
+        Browser->>Server: GET /data/articles-summary-page-1.json
+        Browser->>Server: GET /data/articles-summary-page-2.json
+        Browser->>Server: GET /data/articles-summary-page-N.json
     end
-    Server-->>loader.js:  各页文章数据
-    loader.js->>loader.js: 数组合并（flat）
-    loader.js-->>UI:      全部文章数组
+    Server-->>Browser: 各页摘要数组
+    Note over Browser: 合并为完整 articles 摘要数组，渲染卡片列表
+
+    Browser->>Browser: 用户点击文章
+    Browser->>Server: GET /data/details/3.json
+    Server-->>Browser: { contentHtml: "..." }
+    Note over Browser: 缓存到内存，下次打开同一文章不再请求
 ```

@@ -5,14 +5,15 @@ import { initNavigation } from '../components/navigation.js';
 import { initArticleDetail } from '../components/articleDetail.js';
 import { initToast } from '../components/toast.js';
 import { createArticleCard } from '../components/articleCard.js';
-import { loadManifest, loadAllArticles } from './loader.js';
+import { loadManifest, loadAllSummaries, loadArticleDetail } from './loader.js';
 import { onRouteChange, navigateToArticle, closeArticleRoute, parseArticleId } from './utils/router.js';
 import { initGDPR } from '../components/gdpr.js';
 
 // ---------- 全局状态 ----------
-let articles = [];
+let articles = [];            // 摘要数组（全量）
 let manifest = null;
-let isDataLoaded = false;
+let detailCache = {};         // { [id]: contentHtml }
+let isDataLoaded = false;     // 摘要是否加载完成
 let currentPage = 'home';
 let activeTag = null;
 let articlesYearFilter = null;
@@ -119,6 +120,33 @@ function addCopyButtons() {
 // ---------- 文章数据访问 ----------
 function getArticleById(id) {
     return articles.find(a => a.id === id);
+}
+
+// 获取文章详情内容（带内存缓存）
+async function getArticleContent(articleId) {
+    if (detailCache[articleId]) return detailCache[articleId];
+    const data = await loadArticleDetail(articleId, manifest.detailFilePattern);
+    detailCache[articleId] = data.contentHtml;
+    return data.contentHtml;
+}
+
+// 异步打开文章（加载 contentHtml 后打开面板）
+async function openArticleAsync(id) {
+    if (!detailComponent) return;
+    const article = getArticleById(id);
+    if (!article) return;
+
+    if (!article.contentHtml) {
+        try {
+            window.showToast?.('加载文章内容...');
+            article.contentHtml = await getArticleContent(id);
+        } catch (e) {
+            window.showToast?.('文章加载失败');
+            console.error(e);
+            return;
+        }
+    }
+    detailComponent.open(id);
 }
 
 // ---------- 渲染函数 ----------
@@ -298,13 +326,10 @@ function onPageChange(page) {
 
 // ---------- 路由监听 ----------
 function setupRouter() {
-    onRouteChange((path) => {
+    onRouteChange(async (path) => {
         const articleId = parseArticleId(path);
         if (articleId !== null) {
-            const article = getArticleById(articleId);
-            if (article && detailComponent) {
-                detailComponent.open(articleId);
-            }
+            await openArticleAsync(articleId);
         } else {
             if (detailComponent && detailComponent.getCurrentId() !== null) {
                 detailComponent.close();
@@ -315,6 +340,7 @@ function setupRouter() {
 
 // ---------- 应用初始化 ----------
 async function initApp() {
+    // 基础组件初始化
     initToast(toast);
     initTheme({ themeToggle, themeIcon, themeLabel, hljsLight, hljsDark });
     const { open: openSidebar, close: closeSidebar } = initSidebar({ sidebar, sidebarOverlay, hamburgerBtn, sidebarCloseBtn });
@@ -326,7 +352,6 @@ async function initApp() {
         marketingCheckbox: cookieMarketing,
         settingsBtn: cookieSettingsBtn
     });
-
     navigation = initNavigation({ pageTitle, logoHome, navLinks, pageContents, onPageChange });
     initSearch({ searchInput, searchClear, onSearch });
     backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
@@ -338,8 +363,6 @@ async function initApp() {
     try {
         manifest = await loadManifest();
         articleCountBadge.textContent = manifest.total;
-        // 此时已可以渲染标签云、时间轴（不需要文章列表）
-        // 但需等待页面切换到这些 tab 时才渲染，可先不调用
     } catch (err) {
         console.error(err);
         loadingState.style.display = 'none';
@@ -348,9 +371,9 @@ async function initApp() {
         return;
     }
 
-    // 加载所有文章
+    // 加载所有摘要（使用并发控制 6）
     try {
-        articles = await loadAllArticles(manifest);
+        articles = await loadAllSummaries(manifest, 6);
         isDataLoaded = true;
         loadingState.style.display = 'none';
     } catch (err) {
@@ -361,7 +384,7 @@ async function initApp() {
         return;
     }
 
-    // 初始化详情面板
+    // 初始化文章详情面板（需要传入异步打开方法供组件内部使用）
     detailComponent = initArticleDetail({
         articles,
         overlay: articleDetailOverlay,
@@ -379,6 +402,7 @@ async function initApp() {
             renderTagsCloud();
         },
         getArticleByIdFn: getArticleById,
+        openArticleAsync, // 传入异步加载入口
     });
 
     setupRouter();
@@ -397,8 +421,7 @@ async function initApp() {
         }
     });
 
-    console.log('%c🚀 CodeBlog 已就绪', 'font-weight:bold;color:#0066cc;');
+    console.log('%c🚀 CodeBlog 已就绪（摘要/详情分离）', 'font-weight:bold;color:#0066cc;');
 }
-
 
 initApp();

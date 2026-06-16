@@ -1,0 +1,3 @@
+{
+    "contentHtml": "<p>TypeScript 5.5 是一次<strong>质量提升</strong>更新，带来了多个实用的类型推断改进。让我们逐一了解。</p><h2 id=\"toc-predicate\">推断类型谓词</h2><p>现在 TypeScript 能<strong>自动推断</strong>过滤函数返回的类型谓词。例如使用 <code>filter</code> 后，结果数组的类型会被自动收窄。</p><div class=\"code-block\"><pre><code class=\"language-typescript\">const items = ['hello', undefined, 'world', null];\n// TypeScript 5.5 自动推断出 string[]\nconst validItems = items.filter(item => item !== undefined && item !== null);</code></pre></div><h2 id=\"toc-narrowing\">独立块语句类型收窄</h2><p>在 <code>if</code>、<code>switch</code> 等块语句中，TypeScript 5.5 的<strong>类型收窄更加精准</strong>，减少了不必要的类型断言。</p><h2 id=\"toc-summary\">总结</h2><p>这些改进让 TypeScript 的类型系统<strong>更加智能</strong>，减少了手动类型守卫的需求，提升了开发效率。</p>"
+}

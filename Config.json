@@ -4,12 +4,27 @@
         "domain": "blog.localhost",
         "port": "80",
         "index": "./pages/classic.html",
+
+        "debug":true,
+        "debug_root":"./pages/home.html",
         
         "rewrite":true,
         "staticSite":true,
+
         "cache-client":false,
 
-        "indexedFileInfo": "%Author%-%EMail%-%HashCheck%-%TimeStamp%-%URL%",
+        "dynamicData": {
+            ".tips": "动态数据的内容将由 data 的 articles 文章数据填充！用于相关平台爬虫分析！",
+            "enabled": {
+                "title": "h1",
+                "time": "time",
+                "description": "summary",
+                "keywords": "tag",
+                "author": "author",
+                "image": "cover"
+            }
+        },
+        
         "follow-new": true,
 
         ".tips": "如果广播模式(批量化)建站，务必将 domain 的值修改为 127.0.0.1 避免主机寻找错误。"
