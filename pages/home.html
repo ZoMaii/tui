@@ -5,35 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>CodeBlog · VSCode 风格技术博客</title>
 
-    <!-- Font Awesome 图标库 -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
-
-    <!-- highlight.js 主题样式（明/暗） -->
-    <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs.min.css"
-    id="hljs-light">
-    <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css"
-    id="hljs-dark" disabled>
-
-    <!-- highlight.js 核心库 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js">
+    <!-- 防主题抖动 -->
+    <script>
+        (function() {
+            var saved = localStorage.getItem('codeblog-theme');
+            if (saved) {
+                document.documentElement.setAttribute('data-theme', saved);
+            } else {
+                var hour = new Date().getHours();
+                var auto = (hour >= 19 || hour < 7) ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', auto);
+            }
+        })();
     </script>
 
-    <!-- 自定义样式 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../application/sdk/highlight/styles/vs.min.css" id="hljs-light">
+    <link rel="stylesheet" href="../application/sdk/highlight/styles/vs2015.min.css" id="hljs-dark" disabled>
+    <script src="../application/sdk/highlight/highlight.min.js"></script>
     <link rel="stylesheet" href="home.css">
 </head>
 <body>
-    <!-- 移动端汉堡菜单按钮 -->
     <button class="hamburger-btn" id="hamburgerBtn" aria-label="打开菜单">
         <i class="fa fa-bars"></i>
     </button>
-
-    <!-- 侧边栏遮罩层 -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <div class="container">
-        <!-- ==================== 侧边栏 ==================== -->
+        <!-- 侧边栏 -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <a class="logo" id="logoHome">
@@ -44,7 +43,6 @@
                     <i class="fa fa-times"></i>
                 </button>
             </div>
-
             <span class="nav-section-label">导航</span>
             <ul class="nav-list" id="navList">
                 <li class="nav-item">
@@ -70,7 +68,6 @@
                     </button>
                 </li>
             </ul>
-
             <span class="nav-section-label">外部链接</span>
             <ul class="nav-list">
                 <li class="nav-item">
@@ -86,18 +83,15 @@
                     </a>
                 </li>
             </ul>
-
             <div class="sidebar-footer">
                 <div class="sidebar-social">
-                    <a href="https://github.com" target="_blank" rel="noopener" title="GitHub">
-                        <i class="fa fa-github"></i>
-                    </a>
-                    <a href="#" title="Twitter" onclick="return false;">
-                        <i class="fa fa-twitter"></i>
-                    </a>
-                    <a href="#" title="RSS" onclick="return false;">
-                        <i class="fa fa-rss"></i>
-                    </a>
+                    <a href="https://github.com" target="_blank" rel="noopener" title="GitHub"><i class="fa fa-github"></i></a>
+                    <a href="#" title="Twitter" onclick="return false;"><i class="fa fa-twitter"></i></a>
+                    <a href="#" title="RSS" onclick="return false;"><i class="fa fa-rss"></i></a>
+                    <!-- Cookie 设置按钮 -->
+                    <button class="cookie-settings-btn" id="cookieSettingsBtn" title="Cookie 设置">
+                        <i class="fa fa-cog"></i>
+                    </button>
                 </div>
                 <button class="theme-switch" id="themeToggle" aria-label="切换主题">
                     <span id="themeLabel">暗色模式</span>
@@ -106,7 +100,7 @@
             </div>
         </aside>
 
-        <!-- ==================== 主内容区 ==================== -->
+        <!-- 主内容区 -->
         <main class="main">
             <div class="header">
                 <h1 class="page-title" id="pageTitle">最近发布</h1>
@@ -121,37 +115,27 @@
                 </div>
             </div>
 
-            <!-- 加载状态提示 -->
             <div id="loadingState" style="text-align:center;padding:40px;display:none;">
                 <i class="fa fa-spinner fa-spin" style="font-size:32px;color:var(--text-light);"></i>
                 <p style="margin-top:12px;color:var(--text-light);">正在加载文章数据...</p>
             </div>
-
-            <!-- 错误状态提示 -->
             <div id="errorState" style="text-align:center;padding:40px;display:none;color:var(--text-light);">
                 <i class="fa fa-exclamation-triangle" style="font-size:32px;color:var(--accent);"></i>
                 <p style="margin-top:12px;">文章数据加载失败</p>
                 <button id="retryLoadBtn" style="margin-top:8px;padding:6px 16px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;">重新加载</button>
             </div>
 
-            <!-- 首页文章列表 -->
             <div class="page-content active" id="page-home">
                 <div class="article-list" id="homeArticleList"></div>
             </div>
-
-            <!-- 所有文章（带时间轴筛选） -->
             <div class="page-content" id="page-articles">
                 <div class="timeline-filter" id="timelineFilter"></div>
                 <div class="article-list" id="allArticleList"></div>
             </div>
-
-            <!-- 标签云 -->
             <div class="page-content" id="page-tags">
                 <div class="tags-cloud" id="tagsCloud"></div>
                 <div class="article-list" id="tagFilteredList"></div>
             </div>
-
-            <!-- 关于我 -->
             <div class="page-content" id="page-about">
                 <div class="about-section">
                     <div class="about-card">
@@ -179,10 +163,8 @@
         </main>
     </div>
 
-    <!-- ==================== 文章详情遮罩层 ==================== -->
+    <!-- 文章详情面板 -->
     <div class="article-detail-overlay" id="articleDetailOverlay"></div>
-
-    <!-- ==================== 文章详情面板 ==================== -->
     <div class="article-detail-panel" id="articleDetailPanel">
         <div class="article-progress-bar" id="articleProgressBar"></div>
         <div class="panel-header">
@@ -199,20 +181,48 @@
                 </button>
             </div>
         </div>
-        <div class="panel-body" id="panelBody">
-            <!-- 动态渲染文章内容 -->
-        </div>
+        <div class="panel-body" id="panelBody"></div>
     </div>
 
     <!-- Toast 提示 -->
     <div class="toast" id="toast"></div>
-
-    <!-- 回到顶部按钮 -->
+    <!-- 回到顶部 -->
     <button class="back-to-top" id="backToTop" aria-label="回到顶部">
         <i class="fa fa-arrow-up"></i>
     </button>
 
-    <!-- 主逻辑模块 -->
-    <script type="module" src="/application/app.mjs"></script>
+    <!-- GDPR Cookie 横幅 -->
+    <div class="cookie-banner" id="cookieBanner">
+        <p>本网站使用 Cookies 来改善浏览体验、分析流量并个性化内容。点击“接受全部”即同意使用所有 Cookies。您也可以选择“仅必要”或“自定义设置”。</p>
+        <div class="cookie-banner-actions">
+            <button class="cookie-btn" data-action="accept-all">接受全部</button>
+            <button class="cookie-btn secondary" data-action="essential-only">仅必要</button>
+            <button class="cookie-btn secondary" data-action="open-settings">自定义设置</button>
+        </div>
+    </div>
+
+    <!-- Cookie 设置面板 -->
+    <div class="cookie-modal-overlay" id="cookieModalOverlay"></div>
+    <div class="cookie-modal" id="cookieModal">
+        <h3>Cookie 偏好设置</h3>
+        <div class="cookie-option">
+            <label><input type="checkbox" disabled checked> 必要 Cookies</label>
+            <p>用于网站基本功能，如主题偏好、会话保持。</p>
+        </div>
+        <div class="cookie-option">
+            <label><input type="checkbox" id="cookieAnalytics"> 分析 Cookies</label>
+            <p>帮助我们了解访问者如何与网站互动，以改善内容。</p>
+        </div>
+        <div class="cookie-option">
+            <label><input type="checkbox" id="cookieMarketing"> 营销 Cookies</label>
+            <p>用于投放相关广告（第三方）。</p>
+        </div>
+        <div class="cookie-modal-actions">
+            <button class="cookie-btn" data-action="save-preferences">保存偏好</button>
+            <button class="cookie-btn secondary" data-action="close-modal">取消</button>
+        </div>
+    </div>
+
+    <script type="module" src="../application/app.mjs"></script>
 </body>
 </html>

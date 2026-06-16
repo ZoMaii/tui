@@ -7,9 +7,10 @@
         
         "rewrite":true,
         "staticSite":true,
-        
+        "cache-client":false,
+
         "indexedFileInfo": "%Author%-%EMail%-%HashCheck%-%TimeStamp%-%URL%",
-        "follow-new": false,
+        "follow-new": true,
 
         ".tips": "如果广播模式(批量化)建站，务必将 domain 的值修改为 127.0.0.1 避免主机寻找错误。"
     },
@@ -19,11 +20,6 @@
         "icon": "",
         "title": "",
         "canonical": "",
-
-        "base": {
-            "charset": "utf-8",
-            "viewport": "width=device-width, initial-scale=1.0"
-        },
 
         "meta": {
             "keywords": [],

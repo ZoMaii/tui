@@ -29,3 +29,25 @@ export function getRelatedArticles(articles, currentId, count = 3) {
         .sort((a, b) => b.score - a.score || new Date(b.article.date) - new Date(a.article.date));
     return scored.slice(0, count).map(item => item.article);
 }
+
+/**
+ * 沿文章时效链找到最终版本 ID
+ * @param {Array} articles - 全部文章数据
+ * @param {number} startId   - 起始文章 ID
+ * @returns {number} 链末端文章 ID，若无法找到或出现环则返回 startId 本身
+ */
+export function getLatestArticleId(articles, startId) {
+    const visited = new Set();
+    let currentId = startId;
+    while (currentId) {
+        if (visited.has(currentId)) break; // 检测到环，停止
+        visited.add(currentId);
+        const article = articles.find(a => a.id === currentId);
+        if (!article || !article.new) break;
+        // 跳过无效指向
+        const nextId = article.new;
+        if (typeof nextId !== 'number' || nextId === currentId) break;
+        currentId = nextId;
+    }
+    return currentId;
+}

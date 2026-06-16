@@ -1,0 +1,39 @@
+# tips
+为方便演示，仅用实体文件代替，实际上应该使用 API 的方式请求数据。如果是大量数据采用 Hadoop，少量数据使用 Python(AI) 进行数据处理。
+
+出于安全考虑，务必使用计算集群！
+
+此部分核心内容主要依赖于后端（toHTML...）。需注意 NGINX 的 deny 和 其他鉴权设置。
+
+
+
+# todo:
+- [ ] Service Worker 缓存
+- [ ] 时效与变更校验
+
+
+
+# 当前请求策略：
+
+```mermaid
+sequenceDiagram
+    participant UI
+    participant loader.js
+    participant Server
+
+    UI->>loader.js: 调用 loadManifest()
+    loader.js->>Server:  GET /data/manifest.json
+    Server-->>loader.js:  返回 {total, years, tags, pages}
+    loader.js-->>UI:      返回 manifest 对象
+
+    UI->>loader.js: 调用 loadAllArticles(manifest)
+    loader.js->>loader.js: 提取 manifest.pages（分页文件路径数组）
+    par 并发请求
+        loader.js->>Server:  GET /data/articles-page-1.json
+        loader.js->>Server:  GET /data/articles-page-2.json
+        loader.js->>Server:  GET /data/articles-page-N.json
+    end
+    Server-->>loader.js:  各页文章数据
+    loader.js->>loader.js: 数组合并（flat）
+    loader.js-->>UI:      全部文章数组
+```

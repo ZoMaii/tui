@@ -5,38 +5,37 @@ import { initNavigation } from '../components/navigation.js';
 import { initArticleDetail } from '../components/articleDetail.js';
 import { initToast } from '../components/toast.js';
 import { createArticleCard } from '../components/articleCard.js';
-import { loadArticles } from './loader.js';
+import { loadManifest, loadAllArticles } from './loader.js';
+import { onRouteChange, navigateToArticle, closeArticleRoute, parseArticleId } from './utils/router.js';
+import { initGDPR } from '../components/gdpr.js';
 
 // ---------- 全局状态 ----------
 let articles = [];
+let manifest = null;
 let isDataLoaded = false;
 let currentPage = 'home';
 let activeTag = null;
 let articlesYearFilter = null;
-let currentArticleId = null;    // 由 detail 组件内部维护，这里仅作引用
+let detailComponent = null;
 
-// ---------- DOM 元素集合 ----------
+// ---------- DOM 元素 ----------
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
 
-// 侧边栏
 const sidebar = $('#sidebar');
 const sidebarOverlay = $('#sidebarOverlay');
 const hamburgerBtn = $('#hamburgerBtn');
 const sidebarCloseBtn = $('#sidebarCloseBtn');
 
-// 主题
 const themeToggle = $('#themeToggle');
 const themeIcon = $('#themeIcon');
 const themeLabel = $('#themeLabel');
 const hljsLight = $('#hljs-light');
 const hljsDark = $('#hljs-dark');
 
-// 搜索
 const searchInput = $('#searchInput');
 const searchClear = $('#searchClear');
 
-// 页面容器
 const pageTitle = $('#pageTitle');
 const logoHome = $('#logoHome');
 const navLinks = $$('.nav-link[data-page]');
@@ -51,7 +50,6 @@ const loadingState = $('#loadingState');
 const errorState = $('#errorState');
 const retryLoadBtn = $('#retryLoadBtn');
 
-// 文章详情面板
 const articleDetailOverlay = $('#articleDetailOverlay');
 const articleDetailPanel = $('#articleDetailPanel');
 const articleProgressBar = $('#articleProgressBar');
@@ -61,13 +59,16 @@ const panelCloseBtn = $('#panelCloseBtn');
 const panelCopyLinkBtn = $('#panelCopyLinkBtn');
 const panelShareBtn = $('#panelShareBtn');
 
-// 返回顶部
 const backToTop = $('#backToTop');
-
-// Toast
 const toast = $('#toast');
+const cookieBanner = $('#cookieBanner');
+const cookieModalOverlay = $('#cookieModalOverlay');
+const cookieModal = $('#cookieModal');
+const cookieAnalytics = $('#cookieAnalytics');
+const cookieMarketing = $('#cookieMarketing');
+const cookieSettingsBtn = $('#cookieSettingsBtn');
 
-// ---------- 代码高亮工具（挂载到 window 以便组件调用） ----------
+// ---------- 代码高亮 ----------
 window.highlightAllCode = () => {
     document.querySelectorAll('pre code').forEach(block => {
         if (block.classList.contains('hljs')) {
@@ -115,11 +116,12 @@ function addCopyButtons() {
     });
 }
 
-// ---------- 渲染逻辑（与之前一致，但使用 articles 数组） ----------
+// ---------- 文章数据访问 ----------
 function getArticleById(id) {
     return articles.find(a => a.id === id);
 }
 
+// ---------- 渲染函数 ----------
 function renderHomeArticles() {
     if (!isDataLoaded || !homeArticleList) return;
     homeArticleList.innerHTML = '';
@@ -128,10 +130,10 @@ function renderHomeArticles() {
     [...featured, ...others].slice(0, 4).forEach(a => {
         const card = createArticleCard(a, {
             onTagClick: (tag) => {
-                navigateTo('tags');
+                navigation.navigateTo('tags');
                 filterByTag(tag);
             },
-            onCardClick: (id) => detailComponent.open(id)
+            onCardClick: (id) => navigateToArticle(id)
         });
         homeArticleList.appendChild(card);
     });
@@ -165,21 +167,23 @@ function renderAllArticles() {
     }
     list.forEach(a => {
         allArticleList.appendChild(createArticleCard(a, {
-            onTagClick: (tag) => { navigateTo('tags'); filterByTag(tag); },
-            onCardClick: (id) => detailComponent.open(id)
+            onTagClick: (tag) => {
+                navigation.navigateTo('tags');
+                filterByTag(tag);
+            },
+            onCardClick: (id) => navigateToArticle(id)
         }));
     });
     window.highlightAllCode();
 }
 
 function renderTimelineFilter() {
-    if (!isDataLoaded || !timelineFilter) return;
-    const years = [...new Set(articles.map(a => new Date(a.date).getFullYear()))].sort((a, b) => b - a);
+    if (!timelineFilter || !manifest) return;
+    const years = Object.entries(manifest.years).sort((a, b) => parseInt(b[0]) - parseInt(a[0]));
     let html = `<span class="timeline-filter-label"><i class="fa fa-clock-o"></i> 时间轴</span>`;
-    html += `<button class="timeline-btn ${articlesYearFilter === null ? 'active' : ''}" data-year="all">全部 (${articles.length})</button>`;
-    years.forEach(year => {
-        const count = articles.filter(a => new Date(a.date).getFullYear() === year).length;
-        html += `<button class="timeline-btn ${articlesYearFilter === year ? 'active' : ''}" data-year="${year}">${year} (${count})</button>`;
+    html += `<button class="timeline-btn ${articlesYearFilter === null ? 'active' : ''}" data-year="all">全部 (${manifest.total})</button>`;
+    years.forEach(([year, count]) => {
+        html += `<button class="timeline-btn ${articlesYearFilter === parseInt(year) ? 'active' : ''}" data-year="${year}">${year} (${count})</button>`;
     });
     timelineFilter.innerHTML = html;
     timelineFilter.querySelectorAll('.timeline-btn').forEach(btn => {
@@ -193,11 +197,10 @@ function renderTimelineFilter() {
 }
 
 function renderTagsCloud() {
-    if (!isDataLoaded || !tagsCloud) return;
-    const tagCounts = {};
-    articles.forEach(a => a.tags.forEach(t => { tagCounts[t] = (tagCounts[t] || 0) + 1; }));
+    if (!tagsCloud || !manifest) return;
+    const tagCounts = manifest.tags;
     const sorted = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]);
-    tagsCloud.innerHTML = `<span class="tag-cloud-item ${activeTag === null ? 'active-tag' : ''}" data-tag="all">全部 (${articles.length})</span>`;
+    tagsCloud.innerHTML = `<span class="tag-cloud-item ${activeTag === null ? 'active-tag' : ''}" data-tag="all">全部 (${manifest.total})</span>`;
     sorted.forEach(([tag, count]) => {
         const isActive = activeTag && activeTag.toLowerCase() === tag.toLowerCase();
         tagsCloud.innerHTML += `<span class="tag-cloud-item ${isActive ? 'active-tag' : ''}" data-tag="${tag.toLowerCase()}">${tag} (${count})</span>`;
@@ -231,33 +234,22 @@ function filterByTag(tag) {
     } else {
         filtered.forEach(a => {
             tagFilteredList.appendChild(createArticleCard(a, {
-                onTagClick: (t) => { activeTag = t; renderTagsCloud(); filterByTag(t); },
-                onCardClick: (id) => detailComponent.open(id)
+                onTagClick: (t) => {
+                    activeTag = t;
+                    renderTagsCloud();
+                    filterByTag(t);
+                },
+                onCardClick: (id) => navigateToArticle(id)
             }));
         });
     }
     window.highlightAllCode();
 }
 
-// ---------- 页面导航实现 ----------
-function onPageChange(page) {
-    currentPage = page;
-    activeTag = null;
-    articlesYearFilter = null;
-    searchInput.value = '';
-    searchClear.classList.remove('visible');
-
-    if (page === 'home') renderHomeArticles();
-    else if (page === 'articles') { renderTimelineFilter(); renderAllArticles(); }
-    else if (page === 'tags') renderTagsCloud();
-    // about 页无需渲染
-}
-
 // ---------- 搜索回调 ----------
 function onSearch(query) {
     if (!isDataLoaded) return;
     if (currentPage === 'home') {
-        // 首页卡片隐藏/显示
         if (!homeArticleList) return;
         const cards = homeArticleList.querySelectorAll('.article-card');
         let visible = 0;
@@ -286,47 +278,68 @@ function onSearch(query) {
     }
 }
 
-// 导航组件实例
+// ---------- 页面导航 ----------
 let navigation;
-let detailComponent;
+function onPageChange(page) {
+    currentPage = page;
+    activeTag = null;
+    articlesYearFilter = null;
+    searchInput.value = '';
+    searchClear.classList.remove('visible');
 
-// ---------- 初始化 ----------
+    if (page === 'home') renderHomeArticles();
+    else if (page === 'articles') { renderTimelineFilter(); renderAllArticles(); }
+    else if (page === 'tags') renderTagsCloud();
+
+    if (detailComponent && detailComponent.getCurrentId() !== null) {
+        closeArticleRoute();
+    }
+}
+
+// ---------- 路由监听 ----------
+function setupRouter() {
+    onRouteChange((path) => {
+        const articleId = parseArticleId(path);
+        if (articleId !== null) {
+            const article = getArticleById(articleId);
+            if (article && detailComponent) {
+                detailComponent.open(articleId);
+            }
+        } else {
+            if (detailComponent && detailComponent.getCurrentId() !== null) {
+                detailComponent.close();
+            }
+        }
+    });
+}
+
+// ---------- 应用初始化 ----------
 async function initApp() {
-    // 1. Toast（尽早可用）
     initToast(toast);
-
-    // 2. 主题
     initTheme({ themeToggle, themeIcon, themeLabel, hljsLight, hljsDark });
-
-    // 3. 侧边栏
     const { open: openSidebar, close: closeSidebar } = initSidebar({ sidebar, sidebarOverlay, hamburgerBtn, sidebarCloseBtn });
-
-    // 4. 导航
-    navigation = initNavigation({
-        pageTitle,
-        logoHome,
-        navLinks,
-        pageContents,
-        onPageChange
+    initGDPR({
+        banner: cookieBanner,
+        modalOverlay: cookieModalOverlay,
+        modal: cookieModal,
+        analyticsCheckbox: cookieAnalytics,
+        marketingCheckbox: cookieMarketing,
+        settingsBtn: cookieSettingsBtn
     });
 
-    // 5. 搜索
+    navigation = initNavigation({ pageTitle, logoHome, navLinks, pageContents, onPageChange });
     initSearch({ searchInput, searchClear, onSearch });
-
-    // 6. 返回顶部
     backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-    window.addEventListener('scroll', () => {
-        backToTop.classList.toggle('visible', window.scrollY > 400);
-    }, { passive: true });
+    window.addEventListener('scroll', () => backToTop.classList.toggle('visible', window.scrollY > 400), { passive: true });
 
-    // 7. 加载文章数据
+    // 加载 manifest
     loadingState.style.display = 'block';
     errorState.style.display = 'none';
     try {
-        articles = await loadArticles();
-        isDataLoaded = true;
-        loadingState.style.display = 'none';
-        articleCountBadge.textContent = articles.length;
+        manifest = await loadManifest();
+        articleCountBadge.textContent = manifest.total;
+        // 此时已可以渲染标签云、时间轴（不需要文章列表）
+        // 但需等待页面切换到这些 tab 时才渲染，可先不调用
     } catch (err) {
         console.error(err);
         loadingState.style.display = 'none';
@@ -335,7 +348,20 @@ async function initApp() {
         return;
     }
 
-    // 8. 初始化详情面板（依赖 articles）
+    // 加载所有文章
+    try {
+        articles = await loadAllArticles(manifest);
+        isDataLoaded = true;
+        loadingState.style.display = 'none';
+    } catch (err) {
+        console.error(err);
+        loadingState.style.display = 'none';
+        errorState.style.display = 'block';
+        retryLoadBtn.addEventListener('click', initApp);
+        return;
+    }
+
+    // 初始化详情面板
     detailComponent = initArticleDetail({
         articles,
         overlay: articleDetailOverlay,
@@ -346,7 +372,7 @@ async function initApp() {
         panelCloseBtn,
         panelCopyLinkBtn,
         panelShareBtn,
-        onClose: () => { currentArticleId = null; },
+        onClose: () => closeArticleRoute(),
         onTagNav: (tag) => {
             navigation.navigateTo('tags');
             activeTag = tag;
@@ -355,7 +381,12 @@ async function initApp() {
         getArticleByIdFn: getArticleById,
     });
 
-    // 9. 键盘快捷键 (Ctrl+K)
+    setupRouter();
+
+    // 初始渲染首页
+    renderHomeArticles();
+    window.highlightAllCode();
+
     document.addEventListener('keydown', (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
             if (!detailComponent.getCurrentId()) {
@@ -364,30 +395,10 @@ async function initApp() {
                 searchInput.select();
             }
         }
-        // ESC 已由 detail 组件处理
     });
 
-    // 10. 初始渲染
-    renderHomeArticles();
-    window.highlightAllCode();
-
-    console.log('%c🚀 CodeBlog 已就绪 %c| 按 Ctrl+K 快速搜索 %c| 点击卡片打开文章',
-        'font-weight:bold;color:#0066cc;', 'color:#6a737d;', 'color:#28a745;');
-
-    // 11. 检查初始 hash
-    const hash = window.location.hash;
-    const match = hash.match(/^#article-(\d+)$/);
-    if (match) {
-        const id = parseInt(match[1], 10);
-        if (getArticleById(id)) setTimeout(() => detailComponent.open(id), 400);
-    }
+    console.log('%c🚀 CodeBlog 已就绪', 'font-weight:bold;color:#0066cc;');
 }
 
-// 启动应用
-initApp();
 
-// 暴露调试接口
-window.CodeBlog = {
-    get articles() { return articles; },
-    navigateTo: (page) => navigation?.navigateTo(page),
-};
+initApp();

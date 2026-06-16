@@ -1,7 +1,8 @@
-import { escapeHtml, estimateReadingTime, getRelatedArticles } from '../application/utils/helpers.js';
+import { escapeHtml, estimateReadingTime, getRelatedArticles, getLatestArticleId } from '../application/utils/helpers.js';
+import { navigateToArticle, closeArticleRoute } from '../application/utils/router.js';
 
 export function initArticleDetail({
-    articles,                // 当前文章数据（响应式引用，可能后续更新）
+    articles,
     overlay,
     panel,
     progressBar,
@@ -10,9 +11,9 @@ export function initArticleDetail({
     panelCloseBtn,
     panelCopyLinkBtn,
     panelShareBtn,
-    onClose,                 // 关闭后回调
-    onTagNav,                // 标签点击导航(tag)
-    getArticleByIdFn,        // 获取文章的函数 (id) => article
+    onClose,
+    onTagNav,
+    getArticleByIdFn,
 }) {
     let currentArticleId = null;
     let isAnimating = false;
@@ -30,6 +31,41 @@ export function initArticleDetail({
     };
 
     const renderContent = (article) => {
+        // ---------- 时效链优化提示 ----------
+        let outdatedHtml = '';
+        if (article.new && typeof article.new === 'number') {
+            const directNew = getArticleByIdFn(article.new);
+            const latestId = getLatestArticleId(articles, article.id);
+            const latestNew = getArticleByIdFn(latestId);
+
+            if (directNew && directNew.id !== article.id) {
+                outdatedHtml = `
+                    <div class="outdated-notice">
+                        <i class="fa fa-exclamation-triangle"></i>
+                        <div class="outdated-text">
+                            <strong>此内容可能过时</strong>
+                            <p class="outdated-links">
+                                <span>新版本：<a class="new-article-link" href="#" data-new-id="${directNew.id}">${escapeHtml(directNew.title)}</a></span>
+                                ${(latestNew && latestNew.id !== directNew.id) ? 
+                                    `<span>最新：<a class="new-article-link" href="#" data-new-id="${latestNew.id}">${escapeHtml(latestNew.title)}</a></span>` 
+                                    : ''}
+                            </p>
+                        </div>
+                    </div>`;
+            } else {
+                if (latestNew && latestNew.id !== article.id) {
+                    outdatedHtml = `
+                        <div class="outdated-notice">
+                            <i class="fa fa-exclamation-triangle"></i>
+                            <div class="outdated-text">
+                                <strong>此内容可能过时</strong>
+                                <p>最新版本：<a class="new-article-link" href="#" data-new-id="${latestNew.id}">${escapeHtml(latestNew.title)}</a></p>
+                            </div>
+                        </div>`;
+                }
+            }
+        }
+
         const readingTime = estimateReadingTime(article);
         const index = articles.findIndex(a => a.id === article.id);
         const prevArticle = index > 0 ? articles[index - 1] : null;
@@ -45,7 +81,7 @@ export function initArticleDetail({
             tocItems.push({ id: match[1], title: match[2].replace(/<[^>]*>/g, '') });
         }
 
-        let html = '';
+        let html = outdatedHtml;
         html += `<h1 class="article-detail-title">${escapeHtml(article.title)}</h1>`;
         html += `<div class="article-detail-meta">
             <span><i class="fa fa-calendar-o"></i> ${escapeHtml(article.date)}</span>
@@ -96,7 +132,16 @@ export function initArticleDetail({
 
         panelBody.innerHTML = html;
 
-        // 目录链接点击
+        // 绑定时效链链接
+        panelBody.querySelectorAll('.new-article-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const newId = parseInt(link.dataset.newId, 10);
+                if (newId) navigateToArticle(newId);
+            });
+        });
+
+        // 目录链接
         panelBody.querySelectorAll('.toc-link').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -119,7 +164,7 @@ export function initArticleDetail({
         panelBody.querySelectorAll('.article-nav-btn, .related-card').forEach(btn => {
             btn.addEventListener('click', () => {
                 const targetId = parseInt(btn.getAttribute('data-article-id'), 10);
-                if (targetId) openPanel(targetId);
+                if (targetId) navigateToArticle(targetId);
             });
         });
     };
@@ -132,7 +177,6 @@ export function initArticleDetail({
         currentArticleId = id;
         isAnimating = true;
 
-        window.location.hash = `article-${id}`;
         panelHeaderTitle.textContent = article.title;
         renderContent(article);
 
@@ -146,7 +190,6 @@ export function initArticleDetail({
         document.body.classList.add('body-no-scroll');
 
         setTimeout(() => { isAnimating = false; }, 350);
-        // 代码高亮由外部统一调用，这里延迟触发
         setTimeout(() => {
             if (window.highlightCodeInElement) window.highlightCodeInElement(panelBody);
         }, 200);
@@ -156,9 +199,8 @@ export function initArticleDetail({
         if (isAnimating) return;
         isAnimating = true;
 
-        if (window.location.hash.startsWith('#article-')) {
-            history.replaceState(null, '', window.location.pathname + window.location.search);
-        }
+        // 同步路由器状态
+        closeArticleRoute();
 
         overlay.classList.add('closing');
         panel.classList.add('closing');
@@ -176,11 +218,12 @@ export function initArticleDetail({
         }, 300);
     };
 
-    // 绑定事件
+    // 关闭按钮和遮罩
     panelCloseBtn.addEventListener('click', closePanel);
     overlay.addEventListener('click', closePanel);
     panelBody.addEventListener('scroll', updateProgressBar, { passive: true });
 
+    // 复制链接与分享
     panelCopyLinkBtn.addEventListener('click', () => {
         navigator.clipboard.writeText(window.location.href)
             .then(() => window.showToast?.('🔗 文章链接已复制'))
@@ -200,21 +243,7 @@ export function initArticleDetail({
         }
     });
 
-    // 监听 hash 变化
-    window.addEventListener('hashchange', () => {
-        const hash = window.location.hash;
-        const match = hash.match(/^#article-(\d+)$/);
-        if (match) {
-            const id = parseInt(match[1], 10);
-            if (getArticleByIdFn(id) && currentArticleId !== id) {
-                openPanel(id);
-            }
-        } else if (currentArticleId !== null && !hash.startsWith('#article-')) {
-            closePanel();
-        }
-    });
-
-    // ESC 关闭
+    // 键盘 ESC 关闭
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && currentArticleId !== null) {
             e.preventDefault();

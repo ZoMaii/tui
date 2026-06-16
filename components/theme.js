@@ -1,20 +1,23 @@
 export function initTheme({ themeToggle, themeIcon, themeLabel, hljsLight, hljsDark }) {
-    const applyTheme = (theme) => {
+    const updateUI = (theme) => {
         if (theme === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
             themeIcon.className = 'fa fa-sun-o';
             themeLabel.textContent = '亮色模式';
             if (hljsLight) hljsLight.disabled = true;
             if (hljsDark) hljsDark.disabled = false;
         } else {
-            document.documentElement.setAttribute('data-theme', 'light');
             themeIcon.className = 'fa fa-moon-o';
             themeLabel.textContent = '暗色模式';
             if (hljsLight) hljsLight.disabled = false;
             if (hljsDark) hljsDark.disabled = true;
         }
+    };
+
+    const applyTheme = (theme) => {
+        document.documentElement.setAttribute('data-theme', theme);
         localStorage.setItem('codeblog-theme', theme);
-        // 重新高亮所有代码
+        updateUI(theme);
+        // 重新高亮
         setTimeout(() => {
             if (window.highlightAllCode) window.highlightAllCode();
         }, 100);
@@ -29,7 +32,7 @@ export function initTheme({ themeToggle, themeIcon, themeLabel, hljsLight, hljsD
 
     themeToggle.addEventListener('click', toggleTheme);
 
-    // 初始化主题
-    const saved = localStorage.getItem('codeblog-theme') || 'light';
-    applyTheme(saved);
+    // 初始化 UI 状态（不修改主题属性，只同步图标、文字和代码高亮样式）
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    updateUI(currentTheme);
 }
