@@ -1,0 +1,20 @@
+[
+  {
+    "id": 101,
+    "title": "线上直播：VSCode 主题开发实战",
+    "date": "2026-01-15T20:00:00",
+    "location": "腾讯会议（报名后发送链接）",
+    "description": "手把手带你从零开发一个 VSCode 主题，包含颜色规则与发布流程。",
+    "seats": 50,
+    "booked": 23
+  },
+  {
+    "id": 102,
+    "title": "线下交流会：现代 CSS 布局",
+    "date": "2026-02-10T14:00:00",
+    "location": "上海 · 创智天地",
+    "description": "Flex + Grid + 容器查询，现场 Coding 与问答。",
+    "seats": 30,
+    "booked": 30
+  }
+]

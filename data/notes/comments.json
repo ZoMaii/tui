@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "author": "张三",
+    "avatar": "https://i.pravatar.cc/40?img=1",
+    "date": "2025-12-20",
+    "content": "感谢分享 React 19 的新特性，非常详细！",
+    "likes": 12
+  },
+  {
+    "id": 2,
+    "author": "李四",
+    "avatar": "https://i.pravatar.cc/40?img=2",
+    "date": "2025-12-18",
+    "content": "希望后续能有更多关于 VSCode 主题开发的教程。",
+    "likes": 8
+  },
+  {
+    "id": 3,
+    "author": "王五",
+    "avatar": "https://i.pravatar.cc/40?img=3",
+    "date": "2025-12-16",
+    "content": "干货满满，看完收获超多，已经收藏慢慢学习了。",
+    "likes": 25
+  },
+  {
+    "id": 4,
+    "author": "赵六",
+    "avatar": "https://i.pravatar.cc/40?img=4",
+    "date": "2025-12-15",
+    "content": "前端小白前来打卡，讲解通俗易懂太友好了。",
+    "likes": 16
+  },
+  {
+    "id": 5,
+    "author": "陈七",
+    "avatar": "https://i.pravatar.cc/40?img=5",
+    "date": "2025-12-12",
+    "content": "能不能出一期Vue3项目实战搭建教程，蹲一波！",
+    "likes": 32
+  },
+  {
+    "id": 6,
+    "author": "周八",
+    "avatar": "https://i.pravatar.cc/40?img=6",
+    "date": "2025-12-10",
+    "content": "代码示例清晰易懂，解决了我困扰很久的问题。",
+    "likes": 19
+  },
+  {
+    "id": 7,
+    "author": "吴九",
+    "avatar": "https://i.pravatar.cc/40?img=7",
+    "date": "2025-12-08",
+    "content": "博主技术实力太强了，持续关注更新！",
+    "likes": 41
+  },
+  {
+    "id": 8,
+    "author": "郑十",
+    "avatar": "https://i.pravatar.cc/40?img=8",
+    "date": "2025-12-05",
+    "content": "后端开发来学习前端知识，内容很适合跨栈学习。",
+    "likes": 11
+  },
+  {
+    "id": 9,
+    "author": "林小夏",
+    "avatar": "https://i.pravatar.cc/40?img=9",
+    "date": "2025-12-03",
+    "content": "排版简洁大方，知识点划分得特别合理。",
+    "likes": 22
+  },
+  {
+    "id": 10,
+    "author": "苏沐风",
+    "avatar": "https://i.pravatar.cc/40?img=10",
+    "date": "2025-11-30",
+    "content": "期待更新移动端适配相关的技术分享，十分需要。",
+    "likes": 28
+  }
+]

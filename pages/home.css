@@ -546,3 +546,252 @@ code { font-family: 'Consolas', 'Monaco', 'Cascadia Code', monospace; font-size:
     text-decoration: none;
     opacity: 0.85;
 }
+/* ========== 留言板 & 活动预约通用样式 ========== */
+
+/* 区块标题 */
+.section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* 空状态提示 */
+.empty-hint {
+    text-align: center;
+    padding: 32px;
+    color: var(--text-light);
+    font-size: 14px;
+    background: var(--bg);
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+}
+
+/* ========== 留言板样式 ========== */
+.comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.comment-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 22px;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.comment-item:hover {
+    border-color: var(--accent);
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-2px);
+    background: var(--hover);
+}
+
+/* 头部：头像 + 作者信息 + 点赞 */
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.comment-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    transition: border-color 0.2s;
+}
+
+.comment-item:hover .comment-avatar {
+    border-color: var(--accent);
+}
+
+/* 作者与日期垂直排列 */
+.comment-meta {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.comment-author {
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text);
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.comment-date {
+    font-size: 12px;
+    color: var(--text-light);
+    margin-top: 2px;
+}
+
+/* 点赞数 */
+.comment-likes {
+    font-size: 14px;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: var(--code-bg);
+    transition: background 0.2s, color 0.2s;
+    white-space: nowrap;
+}
+
+.comment-item:hover .comment-likes {
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+
+/* 正文内容 */
+.comment-body {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+    margin: 0;
+    padding-top: 12px;
+    border-top: 1px solid var(--divider);
+    word-break: break-word;
+}
+
+/* 轮播容器（仅在留言超过3条时存在） */
+.carousel-viewport {
+    overflow: hidden;
+    position: relative;
+    border-radius: 10px; /* 与卡片统一圆角 */
+}
+
+.carousel-track {
+    display: flex;
+    flex-direction: column;
+    will-change: transform;
+}
+
+.carousel-track .comment-item {
+    flex-shrink: 0;
+    margin-bottom: 16px;
+    /* 继承 .comment-item 所有样式 */
+}
+
+/* ========== 活动预约样式 ========== */
+.events-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.event-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 22px;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.event-item:hover {
+    border-color: var(--accent);
+    box-shadow: var(--card-shadow);
+}
+
+.event-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.event-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+}
+
+/* 活动状态标签 */
+.event-status {
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.event-open {
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+
+.event-full {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.event-past {
+    background: var(--hover);
+    color: var(--text-light);
+}
+
+/* 活动元信息 */
+.event-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--text-light);
+}
+
+.event-meta span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.event-desc {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* 预约按钮 */
+.book-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    align-self: flex-start;
+}
+
+.book-btn:hover {
+    opacity: 0.9;
+    transform: scale(1.02);
+}
+
+.book-btn:active {
+    transform: scale(0.98);
+}

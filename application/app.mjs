@@ -17,6 +17,7 @@ catch(e)
 if (seo) {
     try {
         seo.send(bridge_json("api@Jinja", {
+            "file": "/index.html",
             "source": document,
             "style": "vue",
             "doc": null,

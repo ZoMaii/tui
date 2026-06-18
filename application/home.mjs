@@ -8,6 +8,9 @@ import { createArticleCard } from '../components/articleCard.js';
 import { loadManifest, loadAllSummaries, loadArticleDetail } from './loader.js';
 import { onRouteChange, navigateToArticle, closeArticleRoute, parseArticleId } from './utils/router.js';
 import { initGDPR } from '../components/gdpr.js';
+import { renderComments } from '../components/comments.js';
+import { renderEvents } from '../components/booking.js'
+
 
 // ---------- 全局状态 ----------
 let articles = [];            // 摘要数组（全量）
@@ -244,6 +247,20 @@ function renderTagsCloud() {
     filterByTag(activeTag);
 }
 
+async function loadAboutPageData() {
+    try {
+        const [comments, events] = await Promise.all([
+            fetch('../data/notes/comments.json').then(r => r.json()),
+            fetch('../data/notes/events.json').then(r => r.json())
+        ]);
+        renderComments($('#commentsList'), comments);
+        renderEvents($('#eventsList'), events);
+    } catch (err) {
+        console.error('加载 about 数据失败:', err);
+        window.showToast?.('加载留言/活动失败');
+    }
+}
+
 function filterByTag(tag) {
     if (!isDataLoaded || !tagFilteredList) return;
     let filtered = !tag ? [...articles] : articles.filter(a => a.tags.some(t => t.toLowerCase() === tag.toLowerCase()));
@@ -318,6 +335,7 @@ function onPageChange(page) {
     if (page === 'home') renderHomeArticles();
     else if (page === 'articles') { renderTimelineFilter(); renderAllArticles(); }
     else if (page === 'tags') renderTagsCloud();
+    else if (page === 'about') loadAboutPageData();
 
     if (detailComponent && detailComponent.getCurrentId() !== null) {
         closeArticleRoute();
