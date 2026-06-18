@@ -223,23 +223,60 @@ export function initArticleDetail({
     overlay.addEventListener('click', closePanel);
     panelBody.addEventListener('scroll', updateProgressBar, { passive: true });
 
-    // 复制链接与分享
+    // ========== 通用复制函数（带移动端回退） ==========
+    function copyToClipboard(text) {
+        // 优先使用现代 API
+        if (navigator.clipboard && window.isSecureContext) {
+            return navigator.clipboard.writeText(text).then(() => true);
+        }
+        // 回退方案：创建临时 textarea
+        return new Promise((resolve, reject) => {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.left = '-9999px';
+            textarea.style.top = '-9999px';
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+            try {
+                const successful = document.execCommand('copy');
+                document.body.removeChild(textarea);
+                if (successful) resolve(true);
+                else reject(new Error('execCommand failed'));
+            } catch (err) {
+                document.body.removeChild(textarea);
+                reject(err);
+            }
+        });
+    }
+
+    // 复制链接按钮事件
     panelCopyLinkBtn.addEventListener('click', () => {
-        navigator.clipboard.writeText(window.location.href)
+        copyToClipboard(window.location.href)
             .then(() => window.showToast?.('🔗 文章链接已复制'))
-            .catch(() => window.showToast?.('⚠️ 复制失败'));
+            .catch(() => window.showToast?.('⚠️ 复制失败，请手动长按链接'));
     });
 
+    // 分享按钮事件
     panelShareBtn.addEventListener('click', () => {
         const article = currentArticleId ? getArticleByIdFn(currentArticleId) : null;
         const title = article ? article.title : 'CodeBlog 文章';
         const url = window.location.href;
+
         if (navigator.share) {
-            navigator.share({ title, url }).catch(() => {});
+            navigator.share({ title, url })
+                .catch(() => {
+                    // 分享失败时回退为复制链接
+                    copyToClipboard(url)
+                        .then(() => window.showToast?.('🔗 链接已复制，可粘贴分享'))
+                        .catch(() => window.showToast?.('⚠️ 分享失败'));
+                });
         } else {
-            navigator.clipboard.writeText(url)
+            // 不支持分享 API，直接复制
+            copyToClipboard(url)
                 .then(() => window.showToast?.('🔗 链接已复制，可粘贴分享'))
-                .catch(() => window.showToast?.('⚠️ 分享失败'));
+                .catch(() => window.showToast?.('⚠️ 复制失败'));
         }
     });
 
