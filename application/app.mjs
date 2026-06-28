@@ -6,7 +6,7 @@ try{
     ({ bridge, bridge_json } = MaicQCR);
 
     // 模块存在再执行桥接逻辑
-    seo = bridge?.python("127.0.0.1", 8080).connect("seo");
+    Release = bridge?.python("127.0.0.1", 8080).connect("Release");
 }
 catch(e)
 {
@@ -14,7 +14,7 @@ catch(e)
 }
 
 // 只有导入成功才执行发送逻辑
-if (seo) {
+if (Release) {
     try {
         seo.send(bridge_json("api@Jinja", {
             "file": "/index.html",

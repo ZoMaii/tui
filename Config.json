@@ -1,125 +1,126 @@
 {
-    ".Manager":[
-        "./application/home.mjs"
-    ],
-    ".site":{
-        ".scenario": "seo.xml",
-        "domain": "blog.localhost",
-        "port": "80",
-        "app": "./application/app.mjs",
-        "debug": true,
-        
-        "rewrite": true,
-        "staticSite": true,
-        "cache-client": false,
-
-        "dynamicData": {
-            ".tips": "动态数据的内容将由 data 的 articles 文章数据填充！用于相关平台爬虫分析！",
-            "enabled": {
-                "title": "h1",
-                "time": "time",
-                "description": "summary",
-                "keywords": "tag",
-                "author": "author",
-                "image": "cover"
+    ".site": {
+        "apply": "Release.xml",
+        "apply-module": "blog",
+        "apply-setting": {
+            ".tip": "详细参考 Release.xml 对 blog 模型的具体定义。涉及到复杂的交火设置须完整配置冲突部分。",
+            "loader": [
+                {"CSR": true},
+                {"SSR": false},
+                {"SSG": true}
+            ],
+            "client": {
+                "cache": true
+            },
+            "server": {
+                "index": "./index.html",
+                "package": "./pages/home.html"
+            },
+            "fire": {
+                "spiders": {
+                    "server": "custom/%dynamicData%",
+                    "server-js": "./application/app.mjs",
+                    "interface": "MaicQCR://develop/tui/api/",
+                    "interface-async": {
+                        "content": ".env:localhost \n try:exec('send(已调取前端配置文件依照后端规则完成爬虫追踪测试！可以在当前终端环境核验数据是否符合预期。)')",
+                        "type": "OpenKV:HOOK",
+                        "method": "POST",
+                        "track": "token/spiders",
+                        "CR_console.title": "🌟 [OpenKV/QCR/Python] 前端配置校验 同步注入任务已启动，注意检测相关 .yaml 文件是否配置正确！"
+                    },
+                    "client": "%@server%",
+                    "client-js": "./application/loader.js"
+                }
             }
         },
+        "develop": false,
 
-        "dom-follow-new": {
-            "source": "./index.html",
-            "head": true
+        "Gateway": {
+            "Trffic": "hosts/master:Gateway",
+            "master": "private/cloudflare:3TH",
+            "cache": {
+                "enabled": true,
+                "retry": true,
+                "update": "12h"
+            },
+            "allow-list": true,
+            "block-list": true
         },
 
-        ".tips": "如果广播模式(批量化)建站，务必将 domain 的值修改为 127.0.0.1 避免主机寻找错误。"
+        "net": {
+            "domain": "blog.localhost",
+            "port": 80
+        },
+
+        "Sheld": {
+            ".tip": "部分功能须借助网关与后端联动实现，某些功能只是被动检测，而非主动防御。\n .site 配置仅在全局代表能被检索到",
+            "3th-observe": [
+                false
+            ],
+            "access": {
+                "CSP": true,
+                "COEP": true,
+                "COOP": true,
+                "CORS": true,
+                "CORP": true,
+                "HSTS": true,
+                "HTTP-only": true,
+                "Referrer": true,
+                "X-Frame-Options": true,
+                "X-Content-Type-Options": true
+            },
+            "attck": {
+                "SRI": true,
+                "XSS": true,
+                "CSRF_token": true,
+                "Trusted-Types": false
+            },
+            "report_security": true,
+            "zero_trust": true
+        }
     },
     
-    "seo.xml":{
-        "html":{
-            "lang": "zh-CN",
-            "icon": "",
-            "title": "",
+    "Release": {
+        "baseline": {
+            "alternate": {},
             "canonical": "",
-
-            "meta": {
-                "keywords": [],
-                "description": ""
-            },
-
-            "alternate":{
-                "x-default":"",
-                "zh-Hans":"",
-                "zh-Hant":"",
-                "ja":"",
-                "en":""
-            },
-
-            "robots":{
-                "index": true,
-                "follow": true
-            },
-
-            "og": {
-                "type":"",
-                "site":"",
-                "title":"",
-                "description":"",
-                "image":"",
-                "url":""
-            },
-
-            "x": {
-                "alias": "twitter",
-                "card": "",
-                "site":""
-            }
+            "siteName": "CodeBlog",
+            "siteLang": "zh_CN",
+            "siteICON": "https://avatars.githubusercontent.com/u/97972060",
+            "siteDescription": "https://github.com/ZoMaii/ZoMaii/blob/main/README.md",
+            "siteKeyWords":["AIGC", "Template", "codeblog"]
         },
-
-        "release": {
-            "robots": {
-                "enabled": true,
-                "rules": [
-                    { "agent": "GPTBot", "disallow": "/" },
-                    { "agent": "Googlebot", "allow": "/" }
-                ],
-                "sitemap": "https://blog.localhost/sitemap.xml",
-                "Crawl-delay": "",
-                "Request-rate": "",
-                "Visit-time": ""
+        "Gateway": {
+            "LLMs.txt": {},
+            "llms-full.txt": {},
+            "robots.txt": {
+                "sitemap":{}
             },
-
-            "sitemap": {
-                "enabled": true,
-                "defaults": {
-                "changefreq": "weekly",
-                "priority": 0.7
-                }
-            },
-
-            "Schema.org":{
-                "dynamic":true,
-                "site": {
-                    "@type": "Organization",
-                    "name": "tui 建站模板",
-                    "url": "https://blog.localhost",
-                    "logo": "https://blog.localhost/logo.png",
-                    "sameAs": [""]
-                }
-            },
-
-            "security.txt":false,
-
-            "LLMs.txt":{
-                "dynamic":true
-            },
-
-            "llms-full.txt":{
-                "dynamic":true
-            }
+            "rss.xml": {},
+            "security.txt": {}
         },
+        "Schema": {},
+        "OG": {},
+        "X": {}
+    },
 
-        "to": {
-            ".tips":"自定义你的接入方式，主要应用于网关交换"
+    "custom": {
+        ".tip": "custom 属于暴露于顶层的自治域范围，一般用于集成其他服务 或 API。例如 Email、OAuth 或 其他已有站点。\n 请参考 Access token 授权层的概念自行设计。",
+
+        "articles": {
+            "open": {
+                "alias": "dynamicData",
+                "source": "api.localhost"
+            },
+            "description": "对接 apply-setting 模型设置的文章打包发布接口。适用于动态数据转换、配置内文件引用，避免 爬虫 数据获取不一致问题。",
+            "standards": {
+                "h1": "title",
+                "time": "time",
+                "summary": "description",
+                "tag": "keywords",
+                "author": "author",
+                "cover": "image"
+            }
         }
     }
-
 }
