@@ -1,0 +1,19 @@
+.cr:okv
+
+```meta
+link:CSRPv0
+area:Helper
+style:filename, kv
+
+# 使用一键预设方式导入，须确保 hubclub 版本保持最新
+worker:develop:temp.demo -n vscode.workspace
+```
+
+```meta.vscode
+Helper.editor.file.allowlist:["./Config.json"]
+```
+
+
+```Config.json
+verify:./output/Config.xsd
+```

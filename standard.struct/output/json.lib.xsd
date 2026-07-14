@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://xml.maichc.club/tui/json"
+    xmlns:tns="http://xml.maichc.club/tui"
+    elementFormDefault="qualified">
+
+    <!-- ============================================
+         JSON 基础类型定义
+         ============================================ -->
+
+    <!-- JSON String -->
+    <xs:simpleType name="String">
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+
+    <!-- JSON Number -->
+    <xs:simpleType name="Number">
+        <xs:restriction base="xs:double"/>
+    </xs:simpleType>
+
+    <!-- JSON Boolean -->
+    <xs:simpleType name="Boolean">
+        <xs:restriction base="xs:boolean"/>
+    </xs:simpleType>
+
+    <!-- JSON Null -->
+    <xs:simpleType name="Null">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="null"/>
+            <xs:enumeration value=""/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- JSON Object：允许任意子元素，可嵌套 -->
+    <xs:complexType name="Object">
+        <xs:sequence>
+            <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+        </xs:sequence>
+        <xs:attribute name="type" type="xs:string" use="optional"/>
+        <xs:anyAttribute processContents="skip"/>
+    </xs:complexType>
+
+    <!-- JSON Array：允许任意子元素，可重复 -->
+    <xs:complexType name="Array">
+        <xs:sequence>
+            <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+        </xs:sequence>
+        <xs:attribute name="type" type="xs:string" use="optional"/>
+        <xs:anyAttribute processContents="skip"/>
+    </xs:complexType>
+
+    <!-- ============================================
+         根元素声明
+         ============================================ -->
+
+    <xs:element name="root">
+        <xs:complexType>
+            <!-- 允许任意子元素 -->
+            <xs:sequence>
+                <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+            </xs:sequence>
+            
+            <!-- 允许实例中 root 上的各类属性 -->
+            <xs:attribute name="elementFormDefault" type="xs:string" use="optional"/>
+            <xs:attribute name="targetNamespace"      type="xs:anyURI" use="optional"/>
+            <xs:attribute name="type"               type="xs:string" use="optional"/>
+            
+            <!-- 允许来自其他命名空间的属性（如 xsi:schemaLocation） -->
+            <xs:anyAttribute namespace="##other" processContents="lax"/>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:tns="http://xml.maichc.club/tui"
+    xmlns:json="http://xml.maichc.club/tui/json"
+    targetNamespace="http://xml.maichc.club/tui"
+    elementFormDefault="qualified">
+
+    <!-- 导入通用 JSON 类型库（用于处理未知的灵活对象） -->
+    <xs:import 
+        namespace="http://xml.maichc.club/tui/json"
+        schemaLocation="./json.lib.xsd"
+    />
+
+    <!-- ===================== 根节点 ===================== -->
+    <xs:element name="Config" type="tns:ConfigType"/>
+
+    <xs:complexType name="ConfigType">
+        <xs:sequence>
+            <xs:element name="line.Site" type="tns:SiteType"/>
+            <xs:element name="Release" type="tns:ReleaseType"/>
+            <xs:element name="Custom" type="tns:CustomType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- ===================== .site 节点 ===================== -->
+    <xs:complexType name="SiteType">
+        <xs:sequence>
+            <xs:element name="apply" type="xs:string"/>
+            <xs:element name="apply-module" type="xs:string"/>
+            <xs:element name="apply-setting" type="tns:ApplySettingType"/>
+            <xs:element name="Develop" type="xs:boolean"/>
+            <xs:element name="Gateway" type="tns:SiteGatewayType"/>
+            <xs:element name="Net" type="tns:NetType"/>
+            <xs:element name="Sheld" type="tns:SheldType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- apply-setting 内部结构 -->
+    <xs:complexType name="ApplySettingType">
+        <xs:sequence>
+            <xs:element name="line.tip" type="xs:string" minOccurs="0"/>
+            <xs:element name="loader" type="tns:LoaderType"/>
+            <xs:element name="client" type="tns:ClientType"/>
+            <xs:element name="server" type="tns:ServerType"/>
+            <xs:element name="fire" type="tns:FireType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- loader 数组项（单选 CSR/SSR/SSG） -->
+    <xs:complexType name="LoaderItemType">
+        <xs:choice>
+            <xs:element name="CSR" type="xs:boolean"/>
+            <xs:element name="SSR" type="xs:boolean"/>
+            <xs:element name="SSG" type="xs:boolean"/>
+        </xs:choice>
+    </xs:complexType>
+    <xs:complexType name="LoaderType">
+        <xs:sequence>
+            <xs:element name="item" type="tns:LoaderItemType" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ClientType">
+        <xs:sequence>
+            <xs:element name="cache" type="xs:boolean"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ServerType">
+        <xs:sequence>
+            <xs:element name="index" type="xs:string"/>
+            <xs:element name="package" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- fire/spiders 深层嵌套 -->
+    <xs:complexType name="FireType">
+        <xs:sequence>
+            <xs:element name="spiders" type="tns:SpidersType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="SpidersType">
+        <xs:sequence>
+            <xs:element name="server" type="xs:string"/>
+            <xs:element name="server-js" type="xs:string"/>
+            <xs:element name="interface" type="xs:string"/>
+            <xs:element name="interface-async" type="tns:InterfaceAsyncType"/>
+            <xs:element name="client" type="xs:string"/>
+            <xs:element name="client-js" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="InterfaceAsyncType">
+        <xs:sequence>
+            <xs:element name="content" type="xs:string"/>
+            <xs:element name="type" type="xs:string"/>
+            <xs:element name="method" type="xs:string"/>
+            <xs:element name="track" type="xs:string"/>
+            <xs:element name="CR_console.title" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Site 下的 Gateway -->
+    <xs:complexType name="SiteGatewayType">
+        <xs:sequence>
+            <xs:element name="Trffic" type="xs:string"/>
+            <xs:element name="master" type="xs:string"/>
+            <xs:element name="cache" type="tns:GatewayCacheType"/>
+            <xs:element name="allow-list" type="xs:boolean"/>
+            <xs:element name="block-list" type="xs:boolean"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="GatewayCacheType">
+        <xs:sequence>
+            <xs:element name="enabled" type="xs:boolean"/>
+            <xs:element name="retry" type="xs:boolean"/>
+            <xs:element name="update" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Net -->
+    <xs:complexType name="NetType">
+        <xs:sequence>
+            <xs:element name="domain" type="xs:string"/>
+            <xs:element name="port" type="xs:integer"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Sheld -->
+    <xs:complexType name="SheldType">
+        <xs:sequence>
+            <xs:element name="line.tip" type="xs:string" minOccurs="0"/>
+            <xs:element name="observe_3th" type="tns:BooleanArrayType"/>
+            <xs:element name="access" type="tns:AccessType"/>
+            <xs:element name="attck" type="tns:AttckType"/>
+            <xs:element name="report_security" type="xs:boolean"/>
+            <xs:element name="zero_trust" type="xs:boolean"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="BooleanArrayType">
+        <xs:sequence>
+            <xs:element name="value" type="xs:boolean" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="AccessType">
+        <xs:sequence>
+            <xs:element name="CSP" type="xs:boolean"/>
+            <xs:element name="COEP" type="xs:boolean"/>
+            <xs:element name="COOP" type="xs:boolean"/>
+            <xs:element name="CORS" type="xs:boolean"/>
+            <xs:element name="CORP" type="xs:boolean"/>
+            <xs:element name="HSTS" type="xs:boolean"/>
+            <xs:element name="HTTP-only" type="xs:boolean"/>
+            <xs:element name="Referrer" type="xs:boolean"/>
+            <xs:element name="X-Frame-Options" type="xs:boolean"/>
+            <xs:element name="X-Content-Type-Options" type="xs:boolean"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="AttckType">
+        <xs:sequence>
+            <xs:element name="SRI" type="xs:boolean"/>
+            <xs:element name="XSS" type="xs:boolean"/>
+            <xs:element name="CSRF_token" type="xs:boolean"/>
+            <xs:element name="Trusted-Types" type="xs:boolean"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- ===================== Release 节点 ===================== -->
+    <xs:complexType name="ReleaseType">
+        <xs:sequence>
+            <xs:element name="baseline" type="tns:BaselineType"/>
+            <xs:element name="Gateway" type="tns:ReleaseGatewayType"/>
+            <xs:element name="Schema" type="tns:EmptyType"/>
+            <xs:element name="OG" type="tns:EmptyType"/>
+            <xs:element name="X" type="tns:EmptyType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="BaselineType">
+        <xs:sequence>
+            <xs:element name="alternate" type="tns:EmptyType"/>
+            <xs:element name="canonical" type="xs:string"/>
+            <xs:element name="siteName" type="xs:string"/>
+            <xs:element name="siteLang" type="xs:string"/>
+            <xs:element name="siteICON" type="xs:string"/>
+            <xs:element name="siteDescription" type="xs:string"/>
+            <xs:element name="siteKeyWords" type="tns:KeywordsType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="KeywordsType">
+        <xs:sequence>
+            <xs:element name="keyword" type="xs:string" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ReleaseGatewayType">
+        <xs:sequence>
+            <xs:element name="LLMs.txt" type="tns:EmptyType"/>
+            <xs:element name="llms-full.txt" type="tns:EmptyType"/>
+            <xs:element name="robots.txt" type="tns:RobotsTxtType"/>
+            <xs:element name="rss.xml" type="tns:EmptyType"/>
+            <xs:element name="security.txt" type="tns:EmptyType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="RobotsTxtType">
+        <xs:sequence>
+            <xs:element name="sitemap" type="tns:EmptyType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- ===================== custom 节点 ===================== -->
+    <xs:complexType name="CustomType">
+        <xs:sequence>
+            <xs:element name="line.tip" type="xs:string" minOccurs="0"/>
+            <xs:element name="articles" type="tns:ArticlesType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ArticlesType">
+        <xs:sequence>
+            <xs:element name="open" type="tns:OpenType"/>
+            <xs:element name="description" type="xs:string"/>
+            <xs:element name="standards" type="tns:StandardsType"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="OpenType">
+        <xs:sequence>
+            <xs:element name="alias" type="xs:string"/>
+            <xs:element name="source" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="StandardsType">
+        <xs:sequence>
+            <xs:element name="h1" type="xs:string"/>
+            <xs:element name="time" type="xs:string"/>
+            <xs:element name="summary" type="xs:string"/>
+            <xs:element name="tag" type="xs:string"/>
+            <xs:element name="author" type="xs:string"/>
+            <xs:element name="cover" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- 通用空对象占位符 -->
+    <xs:complexType name="EmptyType"/>
+
+</xs:schema>

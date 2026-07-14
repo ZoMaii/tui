@@ -33,7 +33,7 @@
                 }
             }
         },
-        "develop": false,
+        "Develop": true,
 
         "Gateway": {
             "Trffic": "hosts/master:Gateway",
@@ -47,7 +47,7 @@
             "block-list": true
         },
 
-        "net": {
+        "Net": {
             "domain": "blog.localhost",
             "port": 80
         },
